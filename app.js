@@ -25,9 +25,6 @@ app.use(express.json());
 function auth(req, res, next) {
   req.role = "user";
   const cookie = req.headers.cookie.slice(10);
-  console.log(req.headers.cookie);
-  console.log(cookie);
-  console.log(req.headers.cookie.includes("sessionId"));
 
   if (req.headers.cookie.includes("sessionId")) {
     db.query(
@@ -157,7 +154,6 @@ app.post("/books", auth, (req, res) => {
 
 app.post("/books/request", auth, (req, res) => {
   const { book_id, user_id } = req.body;
-  console.log(book_id);
   const request = {
     book_id,
     user_id,
@@ -188,6 +184,10 @@ app.post("/books/request", auth, (req, res) => {
 
 app.post("/books/approve", auth, (req, res) => {
   const { requestId } = req.body;
+  if (req.role !== "admin") {
+    res.status(403).send({ msg: "User can not approve books" });
+    return;
+  }
 
   db.query(
     'UPDATE requests SET book_status = "approved" WHERE request_id = ?',
@@ -205,7 +205,11 @@ app.post("/books/approve", auth, (req, res) => {
 
 app.post("/books/reject", auth, (req, res) => {
   const { requestId } = req.body;
-  console.log(requestId);
+  if (req.role !== "admin") {
+    res.status(403).send({ msg: "User can not reject books" });
+    return;
+  }
+
   db.query(
     "DELETE FROM requests WHERE request_id = ?",
     [requestId],
