@@ -46,15 +46,13 @@ app.post("/users", async (req, res) => {
 });
 
 app.post("/books", (req, res) => {
-  const { title, author } = req.body;
+  const { title, author, quantity } = req.body;
 
   const book = {
     title,
     author,
-    book_status: "available",
-    borrower_id: null,
-    checkout_date: null,
-    return_date: null,
+    status: "available",
+    quantity,
   };
 
   db.query("INSERT INTO books SET ?", book, (err, result) => {
@@ -84,6 +82,13 @@ app.post("/books/request", (req, res) => {
     }
     res.status(201).json({ message: "Book request created successfully" });
   });
+
+  db.query('UPDATE books set status = "requested" WHERE book_id = ?', [book_id], (err, result) => {
+    if (err) {
+      res.status(500).json({ error: "Internal server error" });
+      return;
+    }
+ });
 });
 
 app.post("/books/approve", (req, res) => {
@@ -101,10 +106,10 @@ app.post("/books/approve", (req, res) => {
       
 
 app.post("/books/reject", (req, res) => {
-  const { request_id } = req.body;
-
+  const { requestId } = req.body;
+    console.log( requestId) ;
   db.query(
-    "DELETE FROM requests WHERE request_id = ?", request_id,
+    "DELETE FROM requests WHERE request_id = ?", [requestId],
     (err, result) => {
       if (err) {
         console.error("Error rejecting book request:", err);
@@ -117,32 +122,25 @@ app.post("/books/reject", (req, res) => {
 });
 
 app.post("/books/return", (req, res) => {
-  const { book_id, book_status, return_date } = req.body;
-
-  const returnData = {
-    book_status,
-    borrower_id: null,
-    checkout_date: null,
-    return_date,
-    next_checkout_date: null,
-  };
-
-  db.query(
-    "UPDATE books SET ? WHERE book_id = ?",
-    [returnData, book_id],
-    (err, result) => {
-      if (err) {
-        console.error("Error updating book status:", err);
-        res.status(500).json({ error: "Internal server error" });
-        return;
+    const { book_id } = req.body;
+  
+    db.query(
+      "UPDATE books SET status = 'available' WHERE book_id = ?",
+      [book_id],
+      (err, result) => {
+        if (err) {
+          console.error("Error updating book status:", err);
+          res.status(500).json({ error: "Internal server error" });
+          return;
+        }
+        res.json({ message: "Book returned successfully" });
       }
-      res.json({ message: "Book returned successfully" });
-    }
-  );
-});
+    );
+  });
+  
 
 app.get("/users/requests", (req, res) => {
-  const userId = req.user.id;
+  const {userId} = req.body;
 
   db.query(
     "SELECT * FROM requests WHERE user_id = ?",
