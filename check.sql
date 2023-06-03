@@ -25,3 +25,11 @@ CREATE TABLE requests (
   FOREIGN KEY (user_id) REFERENCES users(user_id),
   FOREIGN KEY (book_id) REFERENCES books(book_id)
 );
+
+CREATE TABLE `cookies` (
+  `id` int(11) AUTO_INCREMENT,
+  `sessionId` varchar(255),
+  `userId` int(11),
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (userId) REFERENCES users(user_id)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

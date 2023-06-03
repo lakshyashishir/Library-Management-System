@@ -22,6 +22,38 @@ async function hashPassword(password) {
 
 app.use(express.json());
 
+function auth(req, res, next) {
+  req.role = "user";
+  const cookie = req.headers.cookie.slice(10);
+  console.log(req.headers.cookie);
+  console.log(cookie);
+  console.log(req.headers.cookie.includes("sessionId"));
+
+  if (req.headers.cookie.includes("sessionId")) {
+    db.query(
+      `SELECT cookies.userId, users.role FROM cookies INNER JOIN users ON cookies.userId = users.user_id  WHERE sessionid=${db.escape(
+        cookie
+      )};`,
+      (err, results) => {
+        if (err) {
+          throw err;
+        } else {
+          if (results.length > 0) {
+            const user = results[0];
+            req.userID = user.userId;
+            req.role = user.role;
+            next();
+          } else {
+            res.status(403).send({ msg: "Not Authenticated" });
+          }
+        }
+      }
+    );
+  } else {
+    res.status(403).send({ msg: "Not Authenticated" });
+  }
+}
+
 app.post("/users", async (req, res) => {
   const { username, password, role } = req.body;
   var pass = await hashPassword(password);
@@ -45,7 +77,65 @@ app.post("/users", async (req, res) => {
   });
 });
 
-app.post("/books", (req, res) => {
+app.post("/login", async (req, res) => {
+  const username = req.body.username;
+  const password = req.body.password;
+
+  db.query(
+    `SELECT user_id, hash, role FROM users WHERE username = ?`,
+    [username],
+    async (err, results) => {
+      if (err) {
+        throw err;
+      } else {
+        if (results.length === 0) {
+          console.log(`Incorrect login attempt for ${username}`);
+          return;
+        }
+
+        const user = results[0];
+        const hash = user.hash;
+
+        const isPasswordValid = await bcrypt.compare(password, hash);
+
+        if (isPasswordValid) {
+          console.log(`${username} logged in!`);
+
+          const sessionId = crypto.randomUUID();
+          res.cookie("sessionId", sessionId, {
+            maxAge: 12000000,
+            httpOnly: true,
+          });
+
+          db.query(
+            `INSERT INTO cookies (sessionId, userId) VALUES (?, ?)`,
+            [sessionId, user.user_id],
+            (err) => {
+              if (err) {
+                throw err;
+              }
+              res.role = user.role;
+              if (res.role === "admin") {
+                console.log("admin");
+              } else {
+                console.log("user");
+              }
+            }
+          );
+        } else {
+          console.log(`Incorrect login attempt for ${username}`);
+        }
+      }
+    }
+  );
+});
+
+app.post("/books", auth, (req, res) => {
+  if (req.role !== "admin") {
+    res.status(403).send({ msg: "User can not add books" });
+    return;
+  }
+
   const { title, author, quantity } = req.body;
 
   const book = {
@@ -65,9 +155,9 @@ app.post("/books", (req, res) => {
   });
 });
 
-app.post("/books/request", (req, res) => {
+app.post("/books/request", auth, (req, res) => {
   const { book_id, user_id } = req.body;
-    console.log(book_id);
+  console.log(book_id);
   const request = {
     book_id,
     user_id,
@@ -80,36 +170,45 @@ app.post("/books/request", (req, res) => {
       res.status(500).json({ error: "Internal server error" });
       return;
     }
-    res.status(201).json({ message: "Book request created successfully" });
-  });
 
-  db.query('UPDATE books set status = "requested" WHERE book_id = ?', [book_id], (err, result) => {
-    if (err) {
-      res.status(500).json({ error: "Internal server error" });
-      return;
-    }
- });
+    db.query(
+      'UPDATE books set status = "requested" WHERE book_id = ?',
+      [book_id],
+      (err, result) => {
+        if (err) {
+          res.status(500).json({ error: "Internal server error" });
+          return;
+        }
+
+        res.status(201).json({ message: "Book request created successfully" });
+      }
+    );
+  });
 });
 
-app.post("/books/approve", (req, res) => {
-        const { requestId } = req.body;
-      
-        db.query('UPDATE requests SET book_status = "approved" WHERE request_id = ?', [requestId], (err, result) => {
-          if (err) {
-            console.error("Error approving book request:", err);
-            res.status(500).json({ error: "Internal server error" });
-            return;
-          }
-          res.json({ message: "Book request approved successfully" });
-        });
-      });
-      
-
-app.post("/books/reject", (req, res) => {
+app.post("/books/approve", auth, (req, res) => {
   const { requestId } = req.body;
-    console.log( requestId) ;
+
   db.query(
-    "DELETE FROM requests WHERE request_id = ?", [requestId],
+    'UPDATE requests SET book_status = "approved" WHERE request_id = ?',
+    [requestId],
+    (err, result) => {
+      if (err) {
+        console.error("Error approving book request:", err);
+        res.status(500).json({ error: "Internal server error" });
+        return;
+      }
+      res.json({ message: "Book request approved successfully" });
+    }
+  );
+});
+
+app.post("/books/reject", auth, (req, res) => {
+  const { requestId } = req.body;
+  console.log(requestId);
+  db.query(
+    "DELETE FROM requests WHERE request_id = ?",
+    [requestId],
     (err, result) => {
       if (err) {
         console.error("Error rejecting book request:", err);
@@ -121,26 +220,25 @@ app.post("/books/reject", (req, res) => {
   );
 });
 
-app.post("/books/return", (req, res) => {
-    const { book_id } = req.body;
-  
-    db.query(
-      "UPDATE books SET status = 'available' WHERE book_id = ?",
-      [book_id],
-      (err, result) => {
-        if (err) {
-          console.error("Error updating book status:", err);
-          res.status(500).json({ error: "Internal server error" });
-          return;
-        }
-        res.json({ message: "Book returned successfully" });
-      }
-    );
-  });
-  
+app.post("/books/return", auth, (req, res) => {
+  const { book_id } = req.body;
 
-app.get("/users/requests", (req, res) => {
-  const {userId} = req.body;
+  db.query(
+    "UPDATE books SET status = 'available' WHERE book_id = ?",
+    [book_id],
+    (err, result) => {
+      if (err) {
+        console.error("Error updating book status:", err);
+        res.status(500).json({ error: "Internal server error" });
+        return;
+      }
+      res.json({ message: "Book returned successfully" });
+    }
+  );
+});
+
+app.get("/users/requests", auth, (req, res) => {
+  const userId = req.userID;
 
   db.query(
     "SELECT * FROM requests WHERE user_id = ?",
@@ -152,47 +250,6 @@ app.get("/users/requests", (req, res) => {
         return;
       }
       res.json(results);
-    }
-  );
-});
-
-app.post("/login", async (req, res) => {
-  const username = req.body.username;
-  const password = req.body.password;
-
-  db.query(
-    `SELECT salt, hash, role FROM users WHERE username = ${db.escape(
-      username
-    )};`,
-    async (err, result) => {
-      if (err) {
-        throw err;
-      } else {
-        if (result.length === 0) {
-          console.log(`Incorrect login attempt for ${username}`);
-          return;
-        }
-
-        const user = result[0];
-        const salt = user.salt;
-
-        const hash = await bcrypt.hash(password, salt);
-
-        if (hash === user.hash) {
-          console.log(`${username} logged in!`);
-        } else {
-          console.log(`Incorrect login attempt for ${username}`);
-        }
-
-        //     const isValidPassword = await bcrypt.compare(password, user.hash);
-
-        //     if (isValidPassword) {
-        //       console.log(`${username} logged in!`);
-
-        //     } else {
-        //       console.log(`Incorrect login attempt for ${username}`);
-        //     }
-      }
     }
   );
 });
