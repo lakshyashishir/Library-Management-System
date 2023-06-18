@@ -32,7 +32,15 @@ router.post("/", async (req, res) => {
             maxAge: 12000000,
             httpOnly: true,
           });
-
+          db.query(
+            "DELETE FROM cookies WHERE userId = ?",
+            [user.user_id],
+            (err) => {
+              if (err) {
+                throw err;
+              }
+            }
+          );
           db.query(
             `INSERT INTO cookies (sessionId, userId) VALUES (?, ?)`,
             [sessionId, user.user_id],

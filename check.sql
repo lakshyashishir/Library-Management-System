@@ -11,7 +11,7 @@ CREATE TABLE `books` (
   `book_id` INT(11) NOT NULL AUTO_INCREMENT,
   `title` VARCHAR(255) NOT NULL,
   `author` VARCHAR(255) NOT NULL,
-  `book_status` ENUM('available', 'checked out', 'requested') NOT NULL,
+  `book_status` ENUM('available', 'not available', 'requested') NOT NULL,
   `quantity` INT(11) NOT NULL,
   PRIMARY KEY (`book_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

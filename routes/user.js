@@ -28,7 +28,6 @@ router.post("/request", auth, (req, res) => {
           res.status(500).json({ error: "Internal server error" });
           return;
         }
-
         res.status(201).json({ message: "Book request created successfully" });
       }
     );
@@ -40,11 +39,10 @@ router.post("/return", auth, (req, res) => {
   const user_id = req.userID;
 
   db.query(
-    "UPDATE books SET status = 'available' WHERE book_id = ?",
-    [book_id],
+    "UPDATE books SET status = 'available' WHERE book_id = ? AND user_id = ?",
+    [book_id], [user_id],
     (err, result) => {
       if (err) {
-        console.error("Error updating book status:", err);
         res.status(500).json({ error: "Internal server error" });
         return;
       }

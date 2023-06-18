@@ -1,9 +1,9 @@
 const express = require("express");
 const db = require("../db");
-const {auth}= require("../middleware");
+const { auth } = require("../middleware");
 const router = express.Router();
 
-router.get("/requests", auth, (req, res) => {
+router.get("/all", auth, (req, res) => {
   if (req.role !== "admin") {
     res.status(403).send({ msg: "User is not authorized to view requests" });
     return;
@@ -37,6 +37,29 @@ router.post("/approve", auth, (req, res) => {
         return;
       }
       res.json({ message: "Book request approved successfully" });
+
+      db.query(
+        "SELECT book_id FROM requests WHERE request_id = ?",
+        [requestId],
+        (err, result) => {
+          if (err) {
+            res.status(500).json({ error: "Internal server error" });
+            return;
+          }
+          const book_id = result[0].book_id;
+
+          db.query(
+            'UPDATE books SET status = "not available" WHERE book_id = ?',
+            [book_id],
+            (err, result) => {
+              if (err) {
+                res.status(500).json({ error: "Internal server error" });
+                return;
+              }
+            }
+          );
+        }
+      );
     }
   );
 });
@@ -50,7 +73,7 @@ router.post("/reject", auth, (req, res) => {
   const { requestId } = req.body;
 
   db.query(
-    "DELETE FROM requests WHERE request_id = ?",
+    'UPDATE requests SET book_status = "rejected" WHERE request_id = ?',
     [requestId],
     (err, result) => {
       if (err) {
