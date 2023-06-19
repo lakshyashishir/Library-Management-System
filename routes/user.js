@@ -35,22 +35,6 @@ router.post("/request", auth, (req, res) => {
   });
 });
 
-router.get("/requests", auth, (req, res) => {
-  const user_id = req.userID;
-
-  db.query(
-    "SELECT * FROM requests WHERE user_id = ?",
-    [user_id],
-    (err, results) => {
-      if (err) {
-        res.status(500).json({ error: "Internal server error" });
-        return;
-      }
-      res.json(results);
-    }
-  );
-});
-
 router.post("/return", auth, (req, res) => {
   const { book_id } = req.body;
   const user_id = req.userID;

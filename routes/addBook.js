@@ -5,7 +5,7 @@ const router = express.Router();
 
 router.post("/", auth, (req, res) => {
   if (req.role !== "admin") {
-    res.status(403).send({ msg: "User cannot add books" });
+    res.redirect("/user");
     return;
   }
 

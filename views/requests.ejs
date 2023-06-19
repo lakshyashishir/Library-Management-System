@@ -28,6 +28,7 @@
                         <td><%= requests[i].book_status %></td>
                         <td><%= requests[i].username %></td>
                         <td>
+                        <% if (requests[i].request_status == "pending") { %>
                           <form action="/requests/approve" method="POST">
                             <button type="submit" name="requestId" value="<%= requests[i].request_id %>">
                                 Approve
@@ -39,7 +40,9 @@
                                 <button type="submit" name="requestId" value="<%= requests[i].request_id %>">
                                     Reject
                                 </button>
+                            </form>
                         </td>
+                        <% } %>
                     </tr>
                 <% } %>
             </tbody>

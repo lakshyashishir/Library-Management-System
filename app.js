@@ -6,7 +6,6 @@ const crypto = require("crypto");
 const path = require("path");
 const db = require("./db");
 db.connect();
-const { getUsernamefromUserID } = require("./utils");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -22,9 +21,10 @@ const signupRoute = require("./routes/signup");
 const addBookRoute = require("./routes/addBook");
 const adminRoute = require("./routes/admin");
 const userRoute = require("./routes/user");
-const bookRoute = require("./routes/book");
 const logoutRoute = require("./routes/logout");
 const requestsRoute = require("./routes/requests");
+const myRequestsRoute = require("./routes/myRequests");
+const getBookRoute = require("./routes/getBook");
 
 const { auth } = require("./middleware");
 
@@ -33,9 +33,10 @@ app.use("/signup", signupRoute);
 app.use("/addBook", addBookRoute);
 app.use("/admin", adminRoute);
 app.use("/user", userRoute);
-app.use("/book", bookRoute);
 app.use("/requests", requestsRoute);
 app.use("/logout", logoutRoute);
+app.use("/myrequests", myRequestsRoute);
+app.use("/getbook", getBookRoute);
 
 
 app.get("/", (req, res) => {

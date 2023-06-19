@@ -6,6 +6,10 @@ const router = express.Router();
 
 router.get("/", auth, (req, res) => {
   if (req.role !== "admin") {
+    res.redirect("/user");
+    return;
+    }
+  if (req.role !== "admin") {
     res.status(403).send({ msg: "User is not authorized to view requests" });
     return;
   }
@@ -55,7 +59,7 @@ router.post("/approve", auth, (req, res) => {
         res.status(500).json({ error: "Internal server error" });
         return;
       }
-      // res.json({ message: "Book request approved successfully" });
+      res.json({ message: "Book request approved successfully" });
 
       db.query(
         "SELECT book_id FROM requests WHERE request_id = ?",
