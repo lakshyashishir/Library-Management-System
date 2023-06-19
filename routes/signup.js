@@ -26,10 +26,10 @@ router.post("/", async (req, res) => {
   db.query("INSERT INTO users SET ?", user, (err, result) => {
     if (err) {
       console.error("Error creating user:", err);
-      res.status(500).json({ error: "Internal server error" });
       return;
     }
-    res.status(201).json({ message: "User created successfully" });
+    // alert("User created successfully");
+    res.redirect("/login");
   });
 });
 
@@ -56,12 +56,10 @@ async function checkUsername(username) {
           return;
         }
 
-        console.log(result.length);
-
         if (result.length > 0) {
-          resolve(false); 
+          resolve(false);
         } else {
-          resolve(true); 
+          resolve(true);
         }
       }
     );

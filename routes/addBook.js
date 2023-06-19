@@ -24,8 +24,10 @@ router.post("/", auth, (req, res) => {
       res.status(500).json({ error: "Internal server error" });
       return;
     }
-    res.status(201).json({ message: "Book created successfully" });
-  });
+    // res.status(201).json({ message: "Book created successfully" });
+    // alert("Book created successfully");
+  }
+  );
 });
 
 module.exports = router;

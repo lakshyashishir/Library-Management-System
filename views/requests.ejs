@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Requests</title>
+        <link rel="stylesheet" type="text/css" href="/styles.css">
+    </head>
+
+    <body>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Book ID</th>
+                    <th>Title</th>
+                    <th>Request Status</th>
+                    <th>Book Status</th>
+                    <th>Requested By</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <% for(let i = 0; i < requests.length; i++) { %>
+                    <tr>
+                        <td><%= requests[i].book_id %></td>
+                        <td><%= requests[i].book_title %></td>
+                        <td><%= requests[i].request_status %></td>
+                        <td><%= requests[i].book_status %></td>
+                        <td><%= requests[i].username %></td>
+                        <td>
+                          <form action="/requests/approve" method="POST">
+                            <button type="submit" name="requestId" value="<%= requests[i].request_id %>">
+                                Approve
+                            </button>
+                          </form>
+                        </td>
+                        <td>
+                            <form action="/requests/reject" method="POST">
+                                <button type="submit" name="requestId" value="<%= requests[i].request_id %>">
+                                    Reject
+                                </button>
+                        </td>
+                    </tr>
+                <% } %>
+            </tbody>
+        </table>
+    </body>
+</html>

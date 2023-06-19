@@ -16,6 +16,7 @@ router.post("/", async (req, res) => {
       } else {
         if (results.length === 0) {
           console.log(`Incorrect login attempt for ${username}`);
+          res.status(401).json({ error: "Incorrect username or password" });
           return;
         }
 
@@ -50,14 +51,15 @@ router.post("/", async (req, res) => {
               }
               res.role = user.role;
               if (res.role === "admin") {
-                console.log("admin");
+                res.redirect("/admin");
               } else {
-                console.log("user");
+                res.redirect("/user");
               }
             }
           );
         } else {
           console.log(`Incorrect login attempt for ${username}`);
+          res.status(401).json({ error: "Incorrect username or password" });
         }
       }
     }

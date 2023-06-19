@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>User Dashboard</title>
+    <link rel="stylesheet" type="text/css" href="/styles.css" />
+  </head>
+  <body>
+    <h1>Welcome, <%= username %>!</h1>
+    <h2>User Dashboard</h2>
+    <p>View and manage your account:</p>
+    <form action="">
+      <input type="submit" id="bookTitle" name="bookTitle" />
+    </form>
+    <table>
+        <thead>
+            <tr>
+                <th>Book Title</th>
+            </tr>
+        </thead>
+    </table>
+    <form action="/logout" method="POST">
+      <button type="submit">Logout</button>
+    </form>
+  </body>
+</html>
