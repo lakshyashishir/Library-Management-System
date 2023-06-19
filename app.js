@@ -28,6 +28,7 @@ const myBooksRoute = require("./routes/myBooks");
 const getBookRoute = require("./routes/getBook");
 const reqAdminRoute = require("./routes/reqAdmin");
 const adminRequestsRoute = require("./routes/adminRequests");
+const issuedBooksRoute = require("./routes/issuedBooks");
 
 const { auth } = require("./middleware");
 
@@ -43,6 +44,7 @@ app.use("/getbook", getBookRoute);
 app.use("/mybooks", myBooksRoute);
 app.use("/reqAdmin", reqAdminRoute);
 app.use("/adminRequests", adminRequestsRoute);
+app.use("/issuedBooks", issuedBooksRoute);
 
 
 

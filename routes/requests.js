@@ -9,11 +9,7 @@ router.get("/", auth, (req, res) => {
     res.redirect("/user");
     return;
     }
-  if (req.role !== "admin") {
-    res.status(403).send({ msg: "User is not authorized to view requests" });
-    return;
-  }
-
+    
   db.query("SELECT * FROM requests", async (err, results) => {
     if (err) {
       res.status(500).json({ error: "Internal server error" });

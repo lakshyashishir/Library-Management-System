@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Requests</title>
+        <link rel="stylesheet" type="text/css" href="style.css" />
+    </head>
+
+    <body>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Book ID</th>
+                    <th>Title</th>
+                    <th>Requested By</th>
+                </tr>
+            </thead>
+            <tbody>
+                <h1>Issued Books</h1>
+                <% for(let i = 0; i < requests.length; i++) { %>
+                    <tr>
+                        <% if (requests[i].request_status == "approved") { %>
+                        <td><%= requests[i].book_id %></td>
+                        <td><%= requests[i].book_title %></td>
+                        <td><%= requests[i].username %></td>
+                        <% } %>
+                    </tr>
+                <% } %>
+            </tbody>
+        </table>
+    </body>
+</html>

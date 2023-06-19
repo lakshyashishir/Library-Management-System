@@ -1,6 +1,6 @@
 const express = require("express");
 const db = require("../db");
-const {auth}= require("../middleware");
+const { auth } = require("../middleware");
 const router = express.Router();
 const { getUsernamefromUserID } = require("../utils");
 
@@ -41,15 +41,29 @@ router.post("/return", auth, (req, res) => {
 
   db.query(
     "UPDATE books SET status = 'available' WHERE book_id = ? AND user_id = ?",
-    [book_id], [user_id],
+    [book_id],
+    [user_id],
     (err, result) => {
       if (err) {
         res.status(500).json({ error: "Internal server error" });
         return;
       }
-      res.json({ message: "Book returned successfully" });
     }
   );
+
+  db.query(
+    "delete from requests where book_id = ? AND user_id = ?",
+    [book_id],
+    [user_id],
+    (err, result) => {
+      if (err) {
+        res.status(500).json({ error: "Internal server error" });
+        return;
+      }
+      res.json({ message: "Request removed successfully" });
+    }
+  );
+  res.json({ message: "Book returned successfully" });
 });
 
 router.post("/removeRequest", auth, (req, res) => {
@@ -70,16 +84,13 @@ router.post("/removeRequest", auth, (req, res) => {
   );
 });
 
-
-router.get("/",auth,async (req, res) => {
-  if(req.role !== "admin"){
-  const username = await getUsernamefromUserID(req.userID);
-  res.render("user", { username: username});
-}
-  else{
+router.get("/", auth, async (req, res) => {
+  if (req.role !== "admin") {
+    const username = await getUsernamefromUserID(req.userID);
+    res.render("user", { username: username });
+  } else {
     res.redirect("/admin");
   }
 });
-
 
 module.exports = router;
