@@ -10,6 +10,7 @@ body {
     justify-content: center;
     height: 100vh;
     text-align: center;
+    overflow-y: auto;
   }
   
   h1 {
@@ -27,6 +28,16 @@ body {
   }
   
   input[type="text"] {
+    width: 18.75rem;
+    padding: 0.5rem;
+    font-size: 1.25rem;
+    border: 0.125rem solid #db195b;
+    border-radius: 5%;
+    background-color: #14141f;
+    color: white;
+  }
+
+  input[type="search"] {
     width: 18.75rem;
     padding: 0.5rem;
     font-size: 1.25rem;

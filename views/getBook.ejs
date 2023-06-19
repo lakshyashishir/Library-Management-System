@@ -6,12 +6,75 @@
     <title>Get Books</title>
 </head>
 <body>
-    <h1>Search Books</h1>
-    <form action="/getBook/search" method="POST">
-        <label for="bookTitle">Book Title:</label>
-        <input type="text" id="bookTitle" name="bookTitle" placeholder="Enter book title" required>
-        <br>
-        <button type="submit">Submit</button>
-    </form>
+    <div>
+        <h1>Search Books</h1>
+        <input type="search" id="bookTitle" name="bookTitle" placeholder="Enter book title" data-table="books">
+    </div>
+    <div style="height: 60%; width: 100%; margin: 2rem; align-items: center; justify-content: center;">
+        <table class="table books">
+            <thead>
+                <tr>
+                    <th>Book ID</th>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th>Book Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <% for (let i = 0; i < books.length; i++) { %>
+                    <tr>
+                        <td><%= books[i].book_id %></td>
+                        <td><%= books[i].title %></td>
+                        <td><%= books[i].status %></td>
+                        <td><%= books[i].author %></td>
+                        <td>
+                            <form action="/user/request" method="POST">
+                                <button type="submit" name="book_id" value="<%= books[i].book_id %>">
+                                    Request
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                <% } %>
+            </tbody>
+        </table>
+    </div>
+    <script>
+        (function (document) {
+            'use strict';
+
+            var TableFilter = (function (myArray) {
+                var searchInput;
+
+                function _onInputSearch() {
+                    searchInput = document.getElementById('bookTitle');
+                    var tables = document.getElementsByClassName(searchInput.getAttribute('data-table'));
+                    myArray.forEach.call(tables, function (table) {
+                        myArray.forEach.call(table.tBodies, function (tbody) {
+                            myArray.forEach.call(tbody.rows, function (row) {
+                                var textContent = row.textContent.toLowerCase();
+                                var searchValue = searchInput.value.toLowerCase();
+                                row.style.display = textContent.indexOf(searchValue) > -1 ? '' : 'none';
+                            });
+                        });
+                    });
+                }
+
+                return {
+                    init: function () {
+                        var input = document.getElementById('bookTitle');
+                        input.addEventListener('input', _onInputSearch);
+                    }
+                };
+            })(Array.prototype);
+
+            document.addEventListener('readystatechange', function () {
+                if (document.readyState === 'complete') {
+                    TableFilter.init();
+                }
+            });
+        })(document);
+    </script>
 </body>
 </html>
