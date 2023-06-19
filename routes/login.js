@@ -52,9 +52,13 @@ router.post("/", async (req, res) => {
               res.role = user.role;
               if (res.role === "admin") {
                 res.redirect("/admin");
-              } else {
+              } else if (res.role === "user") {
                 res.redirect("/user");
               }
+              else {
+                res.redirect("/reqAdmin");
+              }
+
             }
           );
         } else {

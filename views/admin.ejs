@@ -3,18 +3,17 @@
 <head>
   <meta charset="utf-8">
   <title>Admin Panel</title>
-  <link rel="stylesheet" type="text/css" href="/styles.css">
+  <link rel="stylesheet" type="text/css" href="style.css" />
 </head>
 <body>
-  <h1>Welcome <%= username %>!</h1> 
-  <h2>Admin Panel</h2>
-  <p>Manage user requests and books:</p>
-  <ul>
+  <h1 class="welcome-user">Welcome <%= username %>!</h1> 
+  <ul class="dashboard-navs">
     <li><a href="/requests">View Requests</a></li>
     <li><a href="/addBook">Add Books</a></li>
+    <li><a href="/adminRequests">View Admin Requests</a></li>
   </ul>
   <form action="/logout" method="POST">
-    <button type="submit">Logout</button>
+    <button class="logout-button" type="submit">Logout</button>
   </form>
 </body>
 </html>

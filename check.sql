@@ -3,7 +3,7 @@ CREATE TABLE users (
   username VARCHAR(255) NOT NULL,
   hash VARCHAR(255) NOT NULL,
   salt VARCHAR(255) NOT NULL,
-  role ENUM('admin', 'user') NOT NULL,
+  role ENUM('admin', 'user', 'admin requested') NOT NULL,
   PRIMARY KEY (user_id)
 ); ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

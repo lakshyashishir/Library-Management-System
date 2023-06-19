@@ -3,15 +3,11 @@
   <head>
     <meta charset="utf-8" />
     <link rel="stylesheet" type="text/css" href="style.css" />
-    <title>User Dashboard</title>
+    <title>Admin Dashboard</title>
   </head>
   <body>
     <h1 class="welcome-user">Welcome, <%= username %>!</h1>
-    <ul class="dashboard-navs">
-      <li ><a href="/myRequests">Your Requests</a></li>
-      <li ><a href="/myBooks">Your Books</a></li>
-      <li ><a href="/getBook">View Books</a></li>
-    </ul>
+    <p>Your admin request is under review.</p>
     <form action="/logout" method="POST">
       <button class="logout-button" type="submit">Logout</button>
     </form>

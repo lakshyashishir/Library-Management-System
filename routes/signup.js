@@ -4,10 +4,15 @@ const db = require("../db");
 const router = express.Router();
 
 router.post("/", async (req, res) => {
-  const { username, password, role } = req.body;
+
+
+  let { username, password, role } = req.body;
   const pass = await hashPassword(password);
   const hash = pass.hash;
   const salt = pass.salt;
+  if(adminExist) {
+    role = 'admin requested';
+  }
 
   const user = {
     username,
@@ -65,5 +70,24 @@ async function checkUsername(username) {
     );
   });
 }
+
+async function adminExist() {
+  return new Promise((resolve, reject) => {
+    db.query("SELECT * FROM users WHERE role = 'admin'", (err, result) => {
+      if (err) {
+        console.error("Error checking admin:", err);
+        reject(err);
+        return;
+      }
+
+      if (result.length > 0) {
+        resolve(true);
+      } else {
+        resolve(false);
+      }
+    });
+  });
+}
+
 
 module.exports = router;

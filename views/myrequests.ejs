@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Requests</title>
+        <link rel="stylesheet" type="text/css" href="style.css" />
+    </head>
+
+    <body>
+        <h1>Your Pending Requests</h1>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Book ID</th>
+                    <th>Title</th>
+                    <th>Request Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% for(let i = 0; i < requests.length; i++) { %>
+                <% if (requests[i].request_status == "pending") { %>
+                
+                    <tr>
+                        <td><%= requests[i].book_id %></td>
+                        <td><%= requests[i].book_title %></td>
+                        <td><%= requests[i].request_status %></td>
+                    </tr>
+                <% } %>
+                <% } %>
+            </tbody>
+        </table>
+        <h1>Rejected Requests</h1>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Book ID</th>
+                    <th>Title</th>
+                    <th>Request Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <% for(let i = 0; i < requests.length; i++) { %>
+                <% if (requests[i].request_status == "rejected") { %>
+                
+                    <tr>
+                        <td><%= requests[i].book_id %></td>
+                        <td><%= requests[i].book_title %></td>
+                        <td><%= requests[i].request_status %></td>
+                        <td>
+                            <form action="/user/removeRequest" method="POST">
+                              <button type="submit" name="requestId" value="<%= requests[i].request_id %>">
+                                  Clear
+                              </button>
+                            </form>
+                          </td>
+                    </tr>
+                <% } %>
+                <% } %>
+            </tbody>
+        </table>
+    </body>
+</html>

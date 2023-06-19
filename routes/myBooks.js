@@ -29,7 +29,7 @@ router.get("/", auth, async (req, res) => {
                 book_title: bookTitle,
             });
             }
-        res.render("myrequests", { requests: mappedResults });
+        res.render("mybooks", { requests: mappedResults });
       }
     );
   });

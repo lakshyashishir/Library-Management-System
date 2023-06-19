@@ -3,11 +3,12 @@
     <head>
         <meta charset="utf-8">
         <title>Requests</title>
-        <link rel="stylesheet" type="text/css" href="/styles.css">
+        <link rel="stylesheet" type="text/css" href="style.css" />
     </head>
 
     <body>
-        <table class="table table-bordered">
+        <h1>Your Books</h1>
+        <table class="table">
             <thead>
                 <tr>
                     <th>Book ID</th>
@@ -18,20 +19,21 @@
             </thead>
             <tbody>
                 <% for(let i = 0; i < requests.length; i++) { %>
+                <% if (requests[i].request_status == "approved") { %>
+                
                     <tr>
                         <td><%= requests[i].book_id %></td>
                         <td><%= requests[i].book_title %></td>
                         <td><%= requests[i].request_status %></td>
                         <td>
-                            <% if (requests[i].request_status == "approved") { %>
-                                <form action="/user/return" method="POST">
-                                    <button type="submit" name="book_id" value="<%= requests[i].book_id %>">
-                                        return
-                                    </button>
-                                </form>
-                                <% } %>
+                            <form action="/user/return" method="POST">
+                                <button type="submit" name="book_id" value="<%= requests[i].book_id %>">
+                                    return
+                                </button>
+                            </form>
                         </td>
                     </tr>
+                <% } %>
                 <% } %>
             </tbody>
         </table>
